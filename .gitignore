@@ -5,6 +5,7 @@
 
 # Package Files #
 *.jar
+!swing2swt.jar
 *.war
 *.ear
 
