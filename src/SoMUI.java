@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.Arrays;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -26,7 +27,6 @@ public class SoMUI {
 	protected List teamList;
 	private Text txtStats;
 	protected Player player = new Player("Jim", "1");
-	int nextTeamIndex = 0;
 
 	/**
 	 * Launch the application.
@@ -185,21 +185,22 @@ public class SoMUI {
 		btnViewStatst.setText("View Stats");
 		btnViewStatst.setBounds(29, 125, 75, 25);
 		
-		Button btnTeamSize = new Button(grpTeam, SWT.NONE);
-		btnTeamSize.addSelectionListener(new SelectionAdapter() {
+		Button btnListTeam = new Button(grpTeam, SWT.NONE);
+		btnListTeam.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Monster[] team = player.getTeam();
 				int size = 0;
 				for (Monster monster : team) {
-					if (monster != null)
-						size++;
+					if (monster != null) {						
+						size++;						
+					}
 				}
-				txtStats.setText(Integer.toString(size));
+				txtStats.setText(Arrays.toString(team));
 			}
 		});
-		btnTeamSize.setBounds(29, 156, 75, 25);
-		btnTeamSize.setText("Team Size");
+		btnListTeam.setBounds(29, 156, 75, 25);
+		btnListTeam.setText("List Team");
 		
 		Button btnAddToTeam = new Button(SoM, SWT.NONE);
 		btnAddToTeam.setBounds(252, 32, 34, 25);
@@ -211,14 +212,24 @@ public class SoMUI {
 											"Use Collect Data first to get monster data");
 				} else if (teamList.getItemCount() < 6 && monsterList.getSelectionIndex() >= 0) {
 					Monster newMonster = d.MonsterMap.get(monsterList.getItem(monsterList.getSelectionIndex()));
+					Monster[] team = player.getTeam();
+					boolean added = false;
+					int indexToAdd = 0;
+					
+					teamList.add(monsterList.getItem(monsterList.getSelectionIndex()));
 					try {
-						player.addMonster(newMonster, nextTeamIndex);
-						nextTeamIndex++;
+						while (added == false) {
+							if (team[indexToAdd] == null) {
+								player.addMonster(newMonster, indexToAdd);
+								added = true;
+							} else {
+								indexToAdd++;
+							}
+						}
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					teamList.add(monsterList.getItem(monsterList.getSelectionIndex()));
 				} else if (teamList.getItemCount() >= 6 && monsterList.getSelectionIndex() >= 0) {
 					MessageDialog.openError(SoM, "List Full", "Your team is already full");
 				} else {
@@ -237,14 +248,23 @@ public class SoMUI {
 			public void widgetSelected(SelectionEvent e) {
 				if (teamList.getItemCount() > 0 && teamList.getSelectionIndex() >= 0) {
 					Monster newMonster = d.MonsterMap.get(teamList.getItem(teamList.getSelectionIndex()));
+					Monster[] updatedTeam = new Monster[6];
+					int nextUpdated = 0;
+					int indexToRemove = teamList.getSelectionIndex();
 					try {
-						nextTeamIndex--;
-						player.removeMonster(newMonster, nextTeamIndex);
+						player.removeMonster(newMonster, indexToRemove);
+						for (Monster m : player.getTeam()) {
+							if (m != null) {
+								updatedTeam[nextUpdated] = m;
+								nextUpdated ++;
+							}
+						player.setTeam(updatedTeam);
+						}
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-					teamList.remove(teamList.getItem(teamList.getSelectionIndex()));
+					teamList.remove(teamList.getSelectionIndex());
 				} else if (teamList.getItemCount() == 0) {
 					MessageDialog.openError(SoM, "List Empty", "Your team is empty");
 				} else {
