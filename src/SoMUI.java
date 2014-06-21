@@ -23,6 +23,8 @@ public class SoMUI {
 
 	protected Shell SoM;
 	protected Database d;
+	protected List attackList;
+	protected List itemList;
 	protected List monsterList;
 	protected List teamList;
 	private Text txtStats;
@@ -61,17 +63,17 @@ public class SoMUI {
 	 */
 	protected void createContents() {
 		SoM = new Shell();
-		SoM.setSize(700, 545);
+		SoM.setSize(738, 720);
 		SoM.setText("States of Matter");
 		SoM.setLayout(null);
 		
 		Group grpMonsterList = new Group(SoM, SWT.NONE);
 		grpMonsterList.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
 		grpMonsterList.setText("Monster List");
-		grpMonsterList.setBounds(113, 10, 133, 300);
+		grpMonsterList.setBounds(302, 104, 140, 295);
 		
 		ScrolledComposite scrolledComposite = new ScrolledComposite(grpMonsterList, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrolledComposite.setBounds(10, 22, 113, 237);
+		scrolledComposite.setBounds(10, 22, 120, 232);
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
 		
@@ -107,6 +109,8 @@ public class SoMUI {
 				items = fd.open();
 				monsters = fd.open();
 				d = new Database(attacks, items, monsters);
+				String[] attackArray;
+				String[] itemArray;
 				String[] monsterArray;
 				
 				try {
@@ -116,15 +120,29 @@ public class SoMUI {
 					return;
 				}
 				
-				monsterArray = new String[d.MonsterMap.size()];
+				attackArray = new String[d.AttackMap.size()];
 				int count = 0;
-				for (Monster nextMonster : d.MonsterMap.values()) {
-					Monster newMonster = nextMonster;
-					monsterArray[count] = nextMonster.getName();
-					newMonster.printStatus();
+				for (Attack nextAttack : d.AttackMap.values()) {
+					attackArray[count] = nextAttack.getName();
+					nextAttack.printAttack();
 					count++;
 				}
-				
+				itemArray = new String[d.ItemMap.size()];
+				count = 0;
+				for (Item nextItem : d.ItemMap.values()) {
+					itemArray[count] = nextItem.getName();
+					nextItem.printItem();
+					count++;
+				}
+				monsterArray = new String[d.MonsterMap.size()];
+				count = 0;
+				for (Monster nextMonster : d.MonsterMap.values()) {
+					monsterArray[count] = nextMonster.getName();
+					nextMonster.printStatus();
+					count++;
+				}
+				attackList.setItems(attackArray);
+				itemList.setItems(itemArray);
 				monsterList.setItems(monsterArray);
 			}
 		});
@@ -132,14 +150,78 @@ public class SoMUI {
 		btnCollectData.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		btnCollectData.setText("Collect Data");
 		
-		Group grpMonsterStats = new Group(SoM, SWT.NONE);
-		grpMonsterStats.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
-		grpMonsterStats.setText("Monster Stats");
-		grpMonsterStats.setBounds(429, 10, 245, 300);
+		Group grpDisplayStats = new Group(SoM, SWT.NONE);
+		grpDisplayStats.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
+		grpDisplayStats.setText("Display Stats");
+		grpDisplayStats.setBounds(10, 405, 245, 267);
 		
-		txtStats = new Text(grpMonsterStats, SWT.BORDER | SWT.WRAP);
-		txtStats.setBounds(10, 22, 225, 268);
+		txtStats = new Text(grpDisplayStats, SWT.BORDER | SWT.WRAP);
 		txtStats.setEditable(false);
+		txtStats.setBounds(10, 22, 225, 235);
+		
+		Group grpAttackList = new Group(SoM, SWT.NONE);
+		grpAttackList.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
+		grpAttackList.setText("Attack List");
+		grpAttackList.setBounds(10, 104, 140, 295);
+		
+		ScrolledComposite scrolledComposite_1 = new ScrolledComposite(grpAttackList, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scrolledComposite_1.setBounds(10, 22, 120, 232);
+		scrolledComposite_1.setExpandHorizontal(true);
+		scrolledComposite_1.setExpandVertical(true);
+		
+		attackList = new List(scrolledComposite_1, SWT.BORDER);
+		scrolledComposite_1.setContent(attackList);
+		scrolledComposite_1.setMinSize(attackList.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		
+		Button btnViewStatsa = new Button(grpAttackList, SWT.NONE);
+		btnViewStatsa.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (attackList.getItemCount() == 0) {
+					MessageDialog.openError(SoM, "List Empty", 
+											"Use Collect Data first to get attack data");
+				} else if (attackList.getSelectionIndex() >= 0 && attackList.getSelectionIndex() >= 0) {
+					Attack statAttack = d.AttackMap.get(attackList.getItem(attackList.getSelectionIndex()));
+					txtStats.setText(statAttack.toString());
+				} else {
+					MessageDialog.openError(SoM, "No Selection", "No attack selected");
+				}
+			}
+		});
+		btnViewStatsa.setText("View Stats");
+		btnViewStatsa.setBounds(35, 260, 70, 25);
+		
+		Group grpItemList = new Group(SoM, SWT.NONE);
+		grpItemList.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
+		grpItemList.setText("Item List");
+		grpItemList.setBounds(156, 104, 140, 295);
+		
+		ScrolledComposite scrolledComposite_2 = new ScrolledComposite(grpItemList, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+		scrolledComposite_2.setBounds(10, 22, 120, 232);
+		scrolledComposite_2.setExpandHorizontal(true);
+		scrolledComposite_2.setExpandVertical(true);
+		
+		itemList = new List(scrolledComposite_2, SWT.BORDER);
+		scrolledComposite_2.setContent(itemList);
+		scrolledComposite_2.setMinSize(itemList.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		
+		Button btnViewStatsi = new Button(grpItemList, SWT.NONE);
+		btnViewStatsi.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (itemList.getItemCount() == 0) {
+					MessageDialog.openError(SoM, "List Empty", 
+											"Use Collect Data first to get item data");
+				} else if (itemList.getSelectionIndex() >= 0 && itemList.getSelectionIndex() >= 0) {
+					Item statItem = d.ItemMap.get(itemList.getItem(itemList.getSelectionIndex()));
+					txtStats.setText(statItem.toString());
+				} else {
+					MessageDialog.openError(SoM, "No Selection", "No item selected");
+				}
+			}
+		});
+		btnViewStatsi.setText("View Stats");
+		btnViewStatsi.setBounds(35, 260, 70, 25);
 		
 		Button btnViewStatsm = new Button(grpMonsterList, SWT.NONE);
 		btnViewStatsm.addSelectionListener(new SelectionAdapter() {
@@ -156,16 +238,16 @@ public class SoMUI {
 				}
 			}
 		});
-		btnViewStatsm.setBounds(29, 265, 75, 25);
+		btnViewStatsm.setBounds(35, 260, 70, 25);
 		btnViewStatsm.setText("View Stats");
 		
 		Group grpTeam = new Group(SoM, SWT.NONE);
 		grpTeam.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
 		grpTeam.setText("Team");
-		grpTeam.setBounds(290, 10, 133, 198);
+		grpTeam.setBounds(488, 104, 140, 190);
 		
 		teamList = new List(grpTeam, SWT.BORDER);
-		teamList.setBounds(10, 22, 113, 97);
+		teamList.setBounds(10, 22, 120, 97);
 		
 		Button btnViewStatst = new Button(grpTeam, SWT.NONE);
 		btnViewStatst.addSelectionListener(new SelectionAdapter() {
@@ -183,27 +265,28 @@ public class SoMUI {
 			}
 		});
 		btnViewStatst.setText("View Stats");
-		btnViewStatst.setBounds(29, 125, 75, 25);
+		btnViewStatst.setBounds(35, 125, 70, 25);
 		
 		Button btnListTeam = new Button(grpTeam, SWT.NONE);
 		btnListTeam.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Monster[] team = player.getTeam();
-				int size = 0;
-				for (Monster monster : team) {
-					if (monster != null) {						
-						size++;						
-					}
-				}
-				txtStats.setText(Arrays.toString(team));
+				String[] names = new String[6];
+				for (int i = 0; i < team.length; i++) {
+					if (team[i] != null) {
+						names[i] = team[i].getName();
+					} else
+						continue;
+				}					
+				txtStats.setText(Arrays.toString(names));
 			}
 		});
-		btnListTeam.setBounds(29, 156, 75, 25);
+		btnListTeam.setBounds(35, 156, 70, 25);
 		btnListTeam.setText("List Team");
 		
 		Button btnAddToTeam = new Button(SoM, SWT.NONE);
-		btnAddToTeam.setBounds(252, 32, 34, 25);
+		btnAddToTeam.setBounds(448, 147, 34, 25);
 		btnAddToTeam.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -241,7 +324,7 @@ public class SoMUI {
 		btnAddToTeam.setText("->");
 		
 		Button btnRemoveFromTeam = new Button(SoM, SWT.NONE);
-		btnRemoveFromTeam.setBounds(252, 63, 34, 25);
+		btnRemoveFromTeam.setBounds(448, 178, 34, 25);
 		btnRemoveFromTeam.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		btnRemoveFromTeam.addSelectionListener(new SelectionAdapter() {
 			@Override
