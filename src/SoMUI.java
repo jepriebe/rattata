@@ -1,5 +1,4 @@
 import java.io.*;
-import java.util.Arrays;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
@@ -29,6 +28,7 @@ public class SoMUI {
 	protected List teamList;
 	private Text txtStats;
 	protected Player player = new Player("Jim", "1");
+	private Text txtLead;
 
 	/**
 	 * Launch the application.
@@ -124,21 +124,18 @@ public class SoMUI {
 				int count = 0;
 				for (Attack nextAttack : d.AttackMap.values()) {
 					attackArray[count] = nextAttack.getName();
-					nextAttack.printAttack();
 					count++;
 				}
 				itemArray = new String[d.ItemMap.size()];
 				count = 0;
 				for (Item nextItem : d.ItemMap.values()) {
 					itemArray[count] = nextItem.getName();
-					nextItem.printItem();
 					count++;
 				}
 				monsterArray = new String[d.MonsterMap.size()];
 				count = 0;
 				for (Monster nextMonster : d.MonsterMap.values()) {
 					monsterArray[count] = nextMonster.getName();
-					nextMonster.printStatus();
 					count++;
 				}
 				attackList.setItems(attackArray);
@@ -177,10 +174,7 @@ public class SoMUI {
 		btnViewStatsa.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (attackList.getItemCount() == 0) {
-					MessageDialog.openError(SoM, "List Empty", 
-											"Use Collect Data first to get attack data");
-				} else if (attackList.getSelectionIndex() >= 0 && attackList.getSelectionIndex() >= 0) {
+				if (attackList.getSelectionIndex() >= 0 && attackList.getSelectionIndex() >= 0) {
 					Attack statAttack = d.AttackMap.get(attackList.getItem(attackList.getSelectionIndex()));
 					txtStats.setText(statAttack.toString());
 				} else {
@@ -209,10 +203,7 @@ public class SoMUI {
 		btnViewStatsi.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (itemList.getItemCount() == 0) {
-					MessageDialog.openError(SoM, "List Empty", 
-											"Use Collect Data first to get item data");
-				} else if (itemList.getSelectionIndex() >= 0 && itemList.getSelectionIndex() >= 0) {
+				if (itemList.getSelectionIndex() >= 0 && itemList.getSelectionIndex() >= 0) {
 					Item statItem = d.ItemMap.get(itemList.getItem(itemList.getSelectionIndex()));
 					txtStats.setText(statItem.toString());
 				} else {
@@ -227,10 +218,7 @@ public class SoMUI {
 		btnViewStatsm.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (monsterList.getItemCount() == 0) {
-					MessageDialog.openError(SoM, "List Empty", 
-											"Use Collect Data first to get monster data");
-				} else if (monsterList.getSelectionIndex() >= 0 && monsterList.getSelectionIndex() >= 0) {
+				if (monsterList.getSelectionIndex() >= 0 && monsterList.getSelectionIndex() >= 0) {
 					Monster statMonster = d.MonsterMap.get(monsterList.getItem(monsterList.getSelectionIndex()));
 					txtStats.setText(statMonster.toString());
 				} else {
@@ -241,59 +229,12 @@ public class SoMUI {
 		btnViewStatsm.setBounds(35, 260, 70, 25);
 		btnViewStatsm.setText("View Stats");
 		
-		Group grpTeam = new Group(SoM, SWT.NONE);
-		grpTeam.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
-		grpTeam.setText("Team");
-		grpTeam.setBounds(488, 104, 140, 190);
-		
-		teamList = new List(grpTeam, SWT.BORDER);
-		teamList.setBounds(10, 22, 120, 97);
-		
-		Button btnViewStatst = new Button(grpTeam, SWT.NONE);
-		btnViewStatst.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				if (teamList.getItemCount() == 0) {
-					MessageDialog.openError(SoM, "List Empty", 
-											"Add a monster to the team first");
-				} else if (teamList.getSelectionIndex() >= 0 && teamList.getSelectionIndex() >= 0) {
-					Monster statMonster = d.MonsterMap.get(teamList.getItem(teamList.getSelectionIndex()));
-					txtStats.setText(statMonster.toString());
-				} else {
-					MessageDialog.openError(SoM, "No Selection", "No monster selected");
-				}
-			}
-		});
-		btnViewStatst.setText("View Stats");
-		btnViewStatst.setBounds(35, 125, 70, 25);
-		
-		Button btnListTeam = new Button(grpTeam, SWT.NONE);
-		btnListTeam.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				Monster[] team = player.getTeam();
-				String[] names = new String[6];
-				for (int i = 0; i < team.length; i++) {
-					if (team[i] != null) {
-						names[i] = team[i].getName();
-					} else
-						continue;
-				}					
-				txtStats.setText(Arrays.toString(names));
-			}
-		});
-		btnListTeam.setBounds(35, 156, 70, 25);
-		btnListTeam.setText("List Team");
-		
 		Button btnAddToTeam = new Button(SoM, SWT.NONE);
 		btnAddToTeam.setBounds(448, 147, 34, 25);
 		btnAddToTeam.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (monsterList.getItemCount() == 0) {
-					MessageDialog.openError(SoM, "List Empty", 
-											"Use Collect Data first to get monster data");
-				} else if (teamList.getItemCount() < 6 && monsterList.getSelectionIndex() >= 0) {
+				if (teamList.getItemCount() < 6 && monsterList.getSelectionIndex() >= 0) {
 					Monster newMonster = d.MonsterMap.get(monsterList.getItem(monsterList.getSelectionIndex()));
 					Monster[] team = player.getTeam();
 					boolean added = false;
@@ -348,13 +289,56 @@ public class SoMUI {
 						e1.printStackTrace();
 					}
 					teamList.remove(teamList.getSelectionIndex());
-				} else if (teamList.getItemCount() == 0) {
-					MessageDialog.openError(SoM, "List Empty", "Your team is empty");
 				} else {
 					MessageDialog.openError(SoM, "No Selection", "No monster selected");
 				}
 			}
 		});
 		btnRemoveFromTeam.setText("<-");
+		
+		Group grpTeam = new Group(SoM, SWT.NONE);
+		grpTeam.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
+		grpTeam.setText("Team");
+		grpTeam.setBounds(488, 104, 140, 218);
+		
+		teamList = new List(grpTeam, SWT.BORDER);
+		teamList.setBounds(10, 49, 120, 97);
+		
+		txtLead = new Text(grpTeam, SWT.BORDER);
+		txtLead.setToolTipText("Lead Monster");
+		txtLead.setEditable(false);
+		txtLead.setBounds(10, 22, 120, 21);
+		
+		Button btnViewStatst = new Button(grpTeam, SWT.NONE);
+		btnViewStatst.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (teamList.getSelectionIndex() >= 0) {
+					Monster statMonster = d.MonsterMap.get(teamList.getItem(teamList.getSelectionIndex()));
+					txtStats.setText(statMonster.toString());
+				} else {
+					MessageDialog.openError(SoM, "No Selection", "No monster selected");
+				}
+			}
+		});
+		btnViewStatst.setText("View Stats");
+		btnViewStatst.setBounds(35, 152, 70, 25);
+		
+		Button btnSetLead = new Button(grpTeam, SWT.NONE);
+		btnSetLead.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (teamList.getSelectionIndex() >= 0) {
+					Monster teamLead = d.MonsterMap.get(teamList.getItem(teamList.getSelectionIndex()));
+					player.setLead(teamLead);
+					String leadName = teamLead.getName();
+					txtLead.setText(leadName);
+				} else {
+					MessageDialog.openError(SoM, "No Selection", "No monster selected");
+				}
+			}
+		});
+		btnSetLead.setBounds(35, 183, 70, 25);
+		btnSetLead.setText("Set Lead");
 	}
 }
