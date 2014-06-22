@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
 
-public class SoMUI {
+public class SoMGUI {
 
 	protected Shell SoM;
 	protected Database d;
@@ -36,7 +36,7 @@ public class SoMUI {
 	 */
 	public static void main(String[] args) {
 		try {
-			SoMUI window = new SoMUI();
+			SoMGUI window = new SoMGUI();
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -167,6 +167,7 @@ public class SoMUI {
 		scrolledComposite_1.setExpandVertical(true);
 		
 		attackList = new List(scrolledComposite_1, SWT.BORDER);
+		attackList.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		scrolledComposite_1.setContent(attackList);
 		scrolledComposite_1.setMinSize(attackList.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		
