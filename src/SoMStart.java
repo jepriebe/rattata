@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
 
 
-public class SoMGUI {
+public class SoMStart {
 
 	protected Shell SoM;
 	protected Database d;
@@ -27,7 +27,7 @@ public class SoMGUI {
 	protected List monsterList;
 	protected List teamList;
 	private Text txtStats;
-	protected Player player = new Player("Jim", "1");
+	protected static Player player = new Player("Jim", "1");
 	private Text txtLead;
 
 	/**
@@ -36,7 +36,7 @@ public class SoMGUI {
 	 */
 	public static void main(String[] args) {
 		try {
-			SoMGUI window = new SoMGUI();
+			SoMStart window = new SoMStart();
 			window.open();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -341,5 +341,21 @@ public class SoMGUI {
 		});
 		btnSetLead.setBounds(35, 183, 70, 25);
 		btnSetLead.setText("Set Lead");
+		
+		Button btnBattle = new Button(SoM, SWT.NONE);
+		btnBattle.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (player.getTeam().length == 6 && player.getLead() != null) {
+					SoMBattle somBattle = new SoMBattle();
+					somBattle.open();
+				} else {
+					MessageDialog.openError(SoM, "Error", "Team must be full and have lead to battle!");
+				}
+			}
+		});
+		btnBattle.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.NORMAL));
+		btnBattle.setBounds(615, 606, 97, 66);
+		btnBattle.setText("BATTLE!");
 	}
 }
