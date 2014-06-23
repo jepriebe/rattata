@@ -6,7 +6,7 @@
 # Package Files #
 *.jar
 swing2swt!.jar
-lib/*.jar
+!lib/*.jar
 *.war
 *.ear
 
