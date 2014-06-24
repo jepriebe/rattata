@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.custom.CCombo;
 
 
 public class SoMStart {
@@ -29,6 +30,7 @@ public class SoMStart {
 	private Text txtStats;
 	protected static Player player = new Player("Jim", "1");
 	private Text txtLead;
+	private CCombo comboState;
 
 	/**
 	 * Launch the application.
@@ -300,7 +302,7 @@ public class SoMStart {
 		Group grpTeam = new Group(SoM, SWT.NONE);
 		grpTeam.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
 		grpTeam.setText("Team");
-		grpTeam.setBounds(488, 104, 140, 218);
+		grpTeam.setBounds(488, 104, 140, 248);
 		
 		teamList = new List(grpTeam, SWT.BORDER);
 		teamList.setBounds(10, 49, 120, 97);
@@ -342,11 +344,30 @@ public class SoMStart {
 		btnSetLead.setBounds(35, 183, 70, 25);
 		btnSetLead.setText("Set Lead");
 		
+		comboState = new CCombo(grpTeam, SWT.BORDER);
+		comboState.setEditable(false);
+		comboState.setBounds(35, 214, 70, 21);
+		comboState.add("SOLID");
+		comboState.add("LIQUID");
+		comboState.add("GAS");
+		comboState.add("PLASMA");
+		comboState.setText("SOLID");
+		comboState.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (comboState.getSelection() != null) {
+					State monState = State.valueOf(comboState.getText());
+					player.getTeam()[teamList.getSelectionIndex()].setState(monState);
+				}
+			}
+		});
+		
 		Button btnBattle = new Button(SoM, SWT.NONE);
 		btnBattle.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (player.getTeam().length == 6 && player.getLead() != null) {
+				if (player.getTeam()[5] != null && player.getLead() != null) {
+					System.out.println(player.getLead().getState());
 					SoMBattle somBattle = new SoMBattle();
 					somBattle.open();
 				} else {
