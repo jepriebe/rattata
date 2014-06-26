@@ -24,13 +24,12 @@ import org.eclipse.swt.custom.CCombo;
 public class SoMStart {
 
 	protected Shell SoM;
-	protected Database d;
+	protected static LocalGameRunner runner = new LocalGameRunner();
 	protected List attackList;
 	protected List itemList;
 	protected List monsterList;
 	protected List teamList;
 	private Text txtStats;
-	protected static Player player = new Player("Jim", "1");
 	private Text txtLead;
 	private CCombo comboState;
 
@@ -102,43 +101,35 @@ public class SoMStart {
 		btnCollectData.addSelectionListener(new SelectionAdapter() {
 			//@Override
 			public void widgetSelected(SelectionEvent e) {
-				
 				FileDialog fd = new FileDialog(SoM, SWT.OPEN);
 				String[] filterExt = { "*.txt" };
-				String attacks;
-				String items;
-				String monsters;
 				fd.setFilterExtensions(filterExt);				
-				attacks = fd.open();
-				items = fd.open();
-				monsters = fd.open();
-				d = new Database(attacks, items, monsters);
-				String[] attackArray;
-				String[] itemArray;
-				String[] monsterArray;
+				runner.setAttFile(fd.open());
+				runner.setItemFile(fd.open());
+				runner.setMonFile(fd.open());
 				
 				try {
-					d.getData();
-				} catch (FileNotFoundException fnfe) {
+					runner.start();
+				} catch (Exception ex) {
 					MessageDialog.openError(SoM, null, "Could not acquire data");
 					return;
 				}
 				
-				attackArray = new String[d.AttackMap.size()];
+				String [] attackArray = new String[runner.getDbase().AttackMap.size()];
 				int count = 0;
-				for (Attack nextAttack : d.AttackMap.values()) {
+				for (Attack nextAttack : runner.getDbase().AttackMap.values()) {
 					attackArray[count] = nextAttack.getName();
 					count++;
 				}
-				itemArray = new String[d.ItemMap.size()];
+				String[] itemArray = new String[runner.getDbase().ItemMap.size()];
 				count = 0;
-				for (Item nextItem : d.ItemMap.values()) {
+				for (Item nextItem : runner.getDbase().ItemMap.values()) {
 					itemArray[count] = nextItem.getName();
 					count++;
 				}
-				monsterArray = new String[d.MonsterMap.size()];
+				String[] monsterArray = new String[runner.getDbase().MonsterMap.size()];
 				count = 0;
-				for (Monster nextMonster : d.MonsterMap.values()) {
+				for (Monster nextMonster : runner.getDbase().MonsterMap.values()) {
 					monsterArray[count] = nextMonster.getName();
 					count++;
 				}
@@ -180,7 +171,7 @@ public class SoMStart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (attackList.getSelectionIndex() >= 0 && attackList.getSelectionIndex() >= 0) {
-					Attack statAttack = d.AttackMap.get(attackList.getItem(attackList.getSelectionIndex()));
+					Attack statAttack = runner.getDbase().AttackMap.get(attackList.getItem(attackList.getSelectionIndex()));
 					txtStats.setText(statAttack.toString());
 				} else {
 					MessageDialog.openError(SoM, "No Selection", "No attack selected");
@@ -209,7 +200,7 @@ public class SoMStart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (itemList.getSelectionIndex() >= 0 && itemList.getSelectionIndex() >= 0) {
-					Item statItem = d.ItemMap.get(itemList.getItem(itemList.getSelectionIndex()));
+					Item statItem = runner.getDbase().ItemMap.get(itemList.getItem(itemList.getSelectionIndex()));
 					txtStats.setText(statItem.toString());
 				} else {
 					MessageDialog.openError(SoM, "No Selection", "No item selected");
@@ -224,7 +215,7 @@ public class SoMStart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (monsterList.getSelectionIndex() >= 0 && monsterList.getSelectionIndex() >= 0) {
-					Monster statMonster = d.MonsterMap.get(monsterList.getItem(monsterList.getSelectionIndex()));
+					Monster statMonster = runner.getDbase().MonsterMap.get(monsterList.getItem(monsterList.getSelectionIndex()));
 					txtStats.setText(statMonster.toString());
 				} else {
 					MessageDialog.openError(SoM, "No Selection", "No monster selected");
@@ -240,8 +231,8 @@ public class SoMStart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (teamList.getItemCount() < 6 && monsterList.getSelectionIndex() >= 0) {
-					Monster newMonster = d.MonsterMap.get(monsterList.getItem(monsterList.getSelectionIndex()));
-					Monster[] team = player.getTeam();
+					Monster newMonster = runner.getDbase().MonsterMap.get(monsterList.getItem(monsterList.getSelectionIndex()));
+					Monster[] team = runner.getPlayer().getTeam();
 					boolean added = false;
 					int indexToAdd = 0;
 					
@@ -249,7 +240,7 @@ public class SoMStart {
 					try {
 						while (added == false) {
 							if (team[indexToAdd] == null) {
-								player.addMonster(newMonster, indexToAdd);
+								runner.getPlayer().addMonster(newMonster, indexToAdd);
 								added = true;
 							} else {
 								indexToAdd++;
@@ -276,18 +267,18 @@ public class SoMStart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (teamList.getItemCount() > 0 && teamList.getSelectionIndex() >= 0) {
-					Monster newMonster = d.MonsterMap.get(teamList.getItem(teamList.getSelectionIndex()));
+					Monster newMonster = runner.getDbase().MonsterMap.get(teamList.getItem(teamList.getSelectionIndex()));
 					Monster[] updatedTeam = new Monster[6];
 					int nextUpdated = 0;
 					int indexToRemove = teamList.getSelectionIndex();
 					try {
-						player.removeMonster(newMonster, indexToRemove);
-						for (Monster m : player.getTeam()) {
+						runner.getPlayer().removeMonster(newMonster, indexToRemove);
+						for (Monster m : runner.getPlayer().getTeam()) {
 							if (m != null) {
 								updatedTeam[nextUpdated] = m;
 								nextUpdated ++;
 							}
-						player.setTeam(updatedTeam);
+						runner.getPlayer().setTeam(updatedTeam);
 						}
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block
@@ -319,7 +310,7 @@ public class SoMStart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (teamList.getSelectionIndex() >= 0) {
-					Monster statMonster = d.MonsterMap.get(teamList.getItem(teamList.getSelectionIndex()));
+					Monster statMonster = runner.getDbase().MonsterMap.get(teamList.getItem(teamList.getSelectionIndex()));
 					txtStats.setText(statMonster.toString());
 				} else {
 					MessageDialog.openError(SoM, "No Selection", "No monster selected");
@@ -334,8 +325,8 @@ public class SoMStart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (teamList.getSelectionIndex() >= 0) {
-					Monster teamLead = d.MonsterMap.get(teamList.getItem(teamList.getSelectionIndex()));
-					player.setLead(teamLead);
+					Monster teamLead = runner.getDbase().MonsterMap.get(teamList.getItem(teamList.getSelectionIndex()));
+					runner.getPlayer().setLead(teamLead);
 					String leadName = teamLead.getName();
 					txtLead.setText(leadName);
 				} else {
@@ -359,7 +350,7 @@ public class SoMStart {
 			public void widgetSelected(SelectionEvent e) {
 				if (comboState.getSelection() != null) {
 					State monState = State.valueOf(comboState.getText());
-					player.getTeam()[teamList.getSelectionIndex()].setState(monState);
+					runner.getPlayer().getTeam()[teamList.getSelectionIndex()].setState(monState);
 				}
 			}
 		});
@@ -368,7 +359,7 @@ public class SoMStart {
 		btnBattle.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (player.getTeam()[5] != null && player.getLead() != null) {
+				if (runner.getPlayer().getTeam()[5] != null && runner.getPlayer().getLead() != null) {
 					SoMBattle somBattle = new SoMBattle();
 					somBattle.open();
 				} else {

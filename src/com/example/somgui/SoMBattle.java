@@ -16,23 +16,15 @@ import org.eclipse.swt.widgets.Button;
 public class SoMBattle {
 
 	protected Shell SoMB;
-	private LocalGameRunner runner = new LocalGameRunner();
-	public static FakeServer server = new FakeServer(); //until connect function in SoMStart works
-	public static Player player = SoMStart.player;
-	private Turn myTurn;
-	public PlayerAction action = PlayerAction.PASS;
-	private int argument;
-	protected Monster[] team = player.getTeam();
-	protected Monster myLead = player.getLead();
-	protected Attack[] attacks = player.getLead().getAttacks();
+	protected static LocalGameRunner runner = SoMStart.runner;
 	private Text txtMe;
 	private Text txtOpp;
 	private Group grpBattle;
 	private Text txtInfo;
-	private static Button btnAttack;
-	private static Button btnState;
-	private static Button btnItem;
-	private static Button btnSwitch;
+	private Button btnAttack;
+	private Button btnState;
+	private Button btnItem;
+	private Button btnSwitch;
 	private CCombo comboAttack;
 	private CCombo comboState;
 	private CCombo comboItem;
@@ -62,15 +54,15 @@ public class SoMBattle {
 		SoMB.layout();
 		while (!SoMB.isDisposed() && true) {
 			if (ready) {
-				btnAttack.setEnabled(true);
-				btnState.setEnabled(true);
-				btnItem.setEnabled(true);
-				btnSwitch.setEnabled(true);
+				this.btnAttack.setEnabled(true);
+				this.btnState.setEnabled(true);
+				this.btnItem.setEnabled(true);
+				this.btnSwitch.setEnabled(true);
 			} else {
-				btnAttack.setEnabled(false);
-				btnState.setEnabled(false);
-				btnItem.setEnabled(false);
-				btnSwitch.setEnabled(false);
+				this.btnAttack.setEnabled(false);
+				this.btnState.setEnabled(false);
+				this.btnItem.setEnabled(false);
+				this.btnSwitch.setEnabled(false);
 			}
 			if (!display.readAndDispatch()) {
 				display.sleep();
