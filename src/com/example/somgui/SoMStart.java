@@ -1,3 +1,5 @@
+package com.example.somgui;
+
 import java.io.*;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -367,7 +369,6 @@ public class SoMStart {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (player.getTeam()[5] != null && player.getLead() != null) {
-					System.out.println(player.getLead().getState());
 					SoMBattle somBattle = new SoMBattle();
 					somBattle.open();
 				} else {
