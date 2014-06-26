@@ -1,7 +1,5 @@
 package com.example.somgui;
 
-import java.io.*;
-
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -230,30 +228,18 @@ public class SoMStart {
 		btnAddToTeam.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (teamList.getItemCount() < 6 && monsterList.getSelectionIndex() >= 0) {
-					Monster newMonster = runner.getDbase().MonsterMap.get(monsterList.getItem(monsterList.getSelectionIndex()));
-					Monster[] team = runner.getPlayer().getTeam();
-					boolean added = false;
-					int indexToAdd = 0;
-					
-					teamList.add(monsterList.getItem(monsterList.getSelectionIndex()));
-					try {
-						while (added == false) {
-							if (team[indexToAdd] == null) {
-								runner.getPlayer().addMonster(newMonster, indexToAdd);
-								added = true;
-							} else {
-								indexToAdd++;
-							}
-						}
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+				try {
+					if (teamList.getItemCount() < 6 && monsterList.getSelectionIndex() >= 0) {
+						runner.addToTeam(monsterList.getItem(monsterList.getSelectionIndex()), 
+										 monsterList.getSelectionIndex());
+						teamList.add(monsterList.getItem(monsterList.getSelectionIndex()));
+					} else if (teamList.getItemCount() >= 6 && monsterList.getSelectionIndex() >= 0) {
+						MessageDialog.openError(SoM, "List Full", "Your team is already full");
+					} else {
+						MessageDialog.openError(SoM, "No Selection", "No monster selected");
 					}
-				} else if (teamList.getItemCount() >= 6 && monsterList.getSelectionIndex() >= 0) {
-					MessageDialog.openError(SoM, "List Full", "Your team is already full");
-				} else {
-					MessageDialog.openError(SoM, "No Selection", "No monster selected");
+				} catch (Exception e1) {
+					e1.printStackTrace();
 				}
 			}
 		});
@@ -266,27 +252,16 @@ public class SoMStart {
 		btnRemoveFromTeam.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (teamList.getItemCount() > 0 && teamList.getSelectionIndex() >= 0) {
-					Monster newMonster = runner.getDbase().MonsterMap.get(teamList.getItem(teamList.getSelectionIndex()));
-					Monster[] updatedTeam = new Monster[6];
-					int nextUpdated = 0;
-					int indexToRemove = teamList.getSelectionIndex();
-					try {
-						runner.getPlayer().removeMonster(newMonster, indexToRemove);
-						for (Monster m : runner.getPlayer().getTeam()) {
-							if (m != null) {
-								updatedTeam[nextUpdated] = m;
-								nextUpdated ++;
-							}
-						runner.getPlayer().setTeam(updatedTeam);
-						}
-					} catch (Exception e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+				try {
+					if (teamList.getItemCount() > 0 && teamList.getSelectionIndex() >= 0) {
+						runner.removeFromTeam(teamList.getItem(teamList.getSelectionIndex()), 
+											  teamList.getSelectionIndex());
+						teamList.remove(teamList.getSelectionIndex());
+					} else {
+						MessageDialog.openError(SoM, "No Selection", "No monster selected");
 					}
-					teamList.remove(teamList.getSelectionIndex());
-				} else {
-					MessageDialog.openError(SoM, "No Selection", "No monster selected");
+				} catch (Exception e1) {
+					e1.printStackTrace();
 				}
 			}
 		});

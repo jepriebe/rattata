@@ -85,8 +85,8 @@ public class SoMBattle {
 		
 		txtMe = new Text(grpMe, SWT.BORDER | SWT.WRAP);
 		String leadStats = String.format("%s%nHP: %d/%d%n" + "State: %s", 
-				   						 myLead.getName(), myLead.getHP(),
-				   						 myLead.getmaxHP(), myLead.getState());
+				   						 runner.getPlayer().getLead().getName(), runner.getPlayer().getLead().getHP(),
+				   						 runner.getPlayer().getLead().getmaxHP(), runner.getPlayer().getLead().getState());
 		txtMe.setText(leadStats);
 		txtMe.setBounds(10, 22, 140, 78);
 		txtMe.setEditable(false);
@@ -130,7 +130,7 @@ public class SoMBattle {
 		comboAttack.setEnabled(false);
 		comboAttack.setEditable(false);
 		comboAttack.setBounds(64, 20, 84, 21);
-		for (Attack a : attacks) {
+		for (Attack a : runner.getPlayer().getLead().getAttacks()) {
 			if (a != null)
 			comboAttack.add(a.getName());
 		}
@@ -138,14 +138,14 @@ public class SoMBattle {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (comboAttack.getSelection() != null) {
-					Attack myAttack = myLead.getAttacks()[comboAttack.getSelectionIndex()];
+					Attack myAttack = runner.getPlayer().getLead().getAttacks()[comboAttack.getSelectionIndex()];
 					comboAttack.setEnabled(false);
 					btnAttack.setEnabled(false);
 					btnState.setEnabled(false);
 					btnItem.setEnabled(false);
 					btnSwitch.setEnabled(false);
 					ready = false;
-					txtInfo.setText(myLead.getName() + " uses " + myAttack.getName() + "!");
+					txtInfo.setText(runner.getPlayer().getLead().getName() + " uses " + myAttack.getName() + "!");
 				}
 			}
 		});
@@ -212,30 +212,30 @@ public class SoMBattle {
 		comboSwitch.setEnabled(false);
 		comboSwitch.setEditable(false);
 		comboSwitch.setBounds(64, 101, 84, 21);
-		for (Monster m : team) {
+		for (Monster m : runner.getPlayer().getTeam()) {
 			if (m != null)
 			comboSwitch.add(m.getName());
 		}
-		comboSwitch.setText(myLead.getName());
-		comboSwitch.addSelectionListener(new SelectionAdapter() {
+		comboSwitch.setText(runner.getPlayer().getLead().getName());
+		/*comboSwitch.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (comboSwitch.getSelection() != null) {
 					action = PlayerAction.SWITCH;
 					argument = comboSwitch.getSelectionIndex();
 					myTurn = new Turn(action, argument);
-					String oldLead = myLead.getName();
+					String oldLead = runner.getPlayer().getLead().getName();
 					myTurn.executeTurn(player);
-					myLead = player.getLead();
+					runner.getPlayer().getLead() = player.getLead();
 					String leadStats = String.format("%s%nHP: %s/%s%n" + "State: %s", 
-	   						 						 myLead.getName(), myLead.getHP(),
-	   						 						 myLead.getmaxHP(), myLead.getState());
+	   						 						 runner.getPlayer().getLead().getName(), runner.getPlayer().getLead().getHP(),
+	   						 						 runner.getPlayer().getLead().getmaxHP(), runner.getPlayer().getLead().getState());
 					txtMe.setText(leadStats);
 					comboSwitch.setEnabled(false);
 					ready = false;
-					txtInfo.setText(oldLead + " is called back and " + myLead.getName() + " is switched in!");
+					txtInfo.setText(oldLead + " is called back and " + runner.getPlayer().getLead().getName() + " is switched in!");
 				}
 			}
-		});
+		});*/
 	}
 }
