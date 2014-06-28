@@ -29,7 +29,7 @@ public class SoMBattle {
 	private CCombo comboState;
 	private CCombo comboItem;
 	private CCombo comboSwitch;
-	private static boolean ready = true; //should be set to false once move selected and set back to true once turn is resolved
+	private boolean ready = true; //should be set to false once move selected and set back to true once turn is resolved
 
 	/**
 	 * Launch the application.
@@ -217,16 +217,15 @@ public class SoMBattle {
 			comboSwitch.add(m.getName());
 		}
 		comboSwitch.setText(runner.getPlayer().getLead().getName());
-		/*comboSwitch.addSelectionListener(new SelectionAdapter() {
+		comboSwitch.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (comboSwitch.getSelection() != null) {
-					action = PlayerAction.SWITCH;
-					argument = comboSwitch.getSelectionIndex();
-					myTurn = new Turn(action, argument);
+					runner.setAction(PlayerAction.SWITCH);
+					runner.setArgument(comboSwitch.getSelectionIndex());
 					String oldLead = runner.getPlayer().getLead().getName();
-					myTurn.executeTurn(player);
-					runner.getPlayer().getLead() = player.getLead();
+					//myTurn.executeTurn(player);
+					//runner.getPlayer().getLead() = player.getLead();
 					String leadStats = String.format("%s%nHP: %s/%s%n" + "State: %s", 
 	   						 						 runner.getPlayer().getLead().getName(), runner.getPlayer().getLead().getHP(),
 	   						 						 runner.getPlayer().getLead().getmaxHP(), runner.getPlayer().getLead().getState());
@@ -236,6 +235,6 @@ public class SoMBattle {
 					txtInfo.setText(oldLead + " is called back and " + runner.getPlayer().getLead().getName() + " is switched in!");
 				}
 			}
-		});*/
+		});
 	}
 }
