@@ -1,5 +1,7 @@
 package com.example.somgui;
 
+import java.io.IOException;
+
 import com.example.statesofmatter.*;
 
 import org.eclipse.swt.widgets.Display;
@@ -123,6 +125,12 @@ public class SoMBattle {
 					comboSwitch.setEnabled(false);
 				}
 				comboAttack.setEnabled(true);
+				try {
+					runner.output.writeObject("tied");
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		

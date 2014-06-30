@@ -1,0 +1,63 @@
+Group grpStartup = new Group(SoM, SWT.NONE);
+		grpStartup.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
+		grpStartup.setText("On Startup");
+		grpStartup.setBounds(10, 10, 97, 90);
+		
+		Button btnConnect = new Button(grpStartup, SWT.NONE);
+		btnConnect.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				runner.connect("localhost", 4444);
+			}
+		});
+		btnConnect.setBounds(10, 24, 78, 25);
+		btnConnect.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		btnConnect.setText("Connect");
+		
+		
+		Button btnCollectData = new Button(grpStartup, SWT.NONE);
+		btnCollectData.setBounds(10, 55, 78, 25);
+		btnCollectData.addSelectionListener(new SelectionAdapter() {
+			//@Override
+			public void widgetSelected(SelectionEvent e) {
+				FileDialog fd = new FileDialog(SoM, SWT.OPEN);
+				String[] filterExt = { "*.txt" };
+				fd.setFilterExtensions(filterExt);				
+				runner.setAttFile(fd.open());
+				runner.setItemFile(fd.open());
+				runner.setMonFile(fd.open());
+				
+				try {
+					runner.start();
+				} catch (Exception ex) {
+					MessageDialog.openError(SoM, null, "Could not acquire data");
+					return;
+				}
+				
+				String [] attackArray = new String[runner.getDbase().AttackMap.size()];
+				int count = 0;
+				for (Attack nextAttack : runner.getDbase().AttackMap.values()) {
+					attackArray[count] = nextAttack.getName();
+					count++;
+				}
+				String[] itemArray = new String[runner.getDbase().ItemMap.size()];
+				count = 0;
+				for (Item nextItem : runner.getDbase().ItemMap.values()) {
+					itemArray[count] = nextItem.getName();
+					count++;
+				}
+				String[] monsterArray = new String[runner.getDbase().MonsterMap.size()];
+				count = 0;
+				for (Monster nextMonster : runner.getDbase().MonsterMap.values()) {
+					monsterArray[count] = nextMonster.getName();
+					count++;
+				}
+				attackList.setItems(attackArray);
+				itemList.setItems(itemArray);
+				monsterList.setItems(monsterArray);
+			}
+		});
+		btnCollectData.setToolTipText("Activates getData method in Database class");
+		btnCollectData.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
+		btnCollectData.setText("Collect Data");
+		

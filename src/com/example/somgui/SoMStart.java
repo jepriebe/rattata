@@ -1,5 +1,7 @@
 package com.example.somgui;
 
+import java.io.IOException;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -68,13 +70,14 @@ public class SoMStart {
 		SoM.setText("States of Matter");
 		SoM.setLayout(null);
 		
+		
 		Group grpMonsterList = new Group(SoM, SWT.NONE);
 		grpMonsterList.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
 		grpMonsterList.setText("Monster List");
-		grpMonsterList.setBounds(302, 104, 140, 295);
+		grpMonsterList.setBounds(302, 10, 140, 389);
 		
 		ScrolledComposite scrolledComposite = new ScrolledComposite(grpMonsterList, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrolledComposite.setBounds(10, 22, 120, 232);
+		scrolledComposite.setBounds(10, 22, 120, 326);
 		scrolledComposite.setExpandHorizontal(true);
 		scrolledComposite.setExpandVertical(true);
 		
@@ -82,63 +85,6 @@ public class SoMStart {
 		monsterList.setItems(new String[] {});
 		scrolledComposite.setContent(monsterList);
 		scrolledComposite.setMinSize(monsterList.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		
-		Group grpStartup = new Group(SoM, SWT.NONE);
-		grpStartup.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
-		grpStartup.setText("On Startup");
-		grpStartup.setBounds(10, 10, 97, 90);
-		
-		Button btnConnect = new Button(grpStartup, SWT.NONE);
-		btnConnect.setBounds(10, 24, 78, 25);
-		btnConnect.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		btnConnect.setText("Connect");
-		
-		
-		Button btnCollectData = new Button(grpStartup, SWT.NONE);
-		btnCollectData.setBounds(10, 55, 78, 25);
-		btnCollectData.addSelectionListener(new SelectionAdapter() {
-			//@Override
-			public void widgetSelected(SelectionEvent e) {
-				FileDialog fd = new FileDialog(SoM, SWT.OPEN);
-				String[] filterExt = { "*.txt" };
-				fd.setFilterExtensions(filterExt);				
-				runner.setAttFile(fd.open());
-				runner.setItemFile(fd.open());
-				runner.setMonFile(fd.open());
-				
-				try {
-					runner.start();
-				} catch (Exception ex) {
-					MessageDialog.openError(SoM, null, "Could not acquire data");
-					return;
-				}
-				
-				String [] attackArray = new String[runner.getDbase().AttackMap.size()];
-				int count = 0;
-				for (Attack nextAttack : runner.getDbase().AttackMap.values()) {
-					attackArray[count] = nextAttack.getName();
-					count++;
-				}
-				String[] itemArray = new String[runner.getDbase().ItemMap.size()];
-				count = 0;
-				for (Item nextItem : runner.getDbase().ItemMap.values()) {
-					itemArray[count] = nextItem.getName();
-					count++;
-				}
-				String[] monsterArray = new String[runner.getDbase().MonsterMap.size()];
-				count = 0;
-				for (Monster nextMonster : runner.getDbase().MonsterMap.values()) {
-					monsterArray[count] = nextMonster.getName();
-					count++;
-				}
-				attackList.setItems(attackArray);
-				itemList.setItems(itemArray);
-				monsterList.setItems(monsterArray);
-			}
-		});
-		btnCollectData.setToolTipText("Activates getData method in Database class");
-		btnCollectData.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
-		btnCollectData.setText("Collect Data");
 		
 		Group grpDisplayStats = new Group(SoM, SWT.NONE);
 		grpDisplayStats.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
@@ -152,10 +98,10 @@ public class SoMStart {
 		Group grpAttackList = new Group(SoM, SWT.NONE);
 		grpAttackList.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
 		grpAttackList.setText("Attack List");
-		grpAttackList.setBounds(10, 104, 140, 295);
+		grpAttackList.setBounds(10, 10, 140, 389);
 		
 		ScrolledComposite scrolledComposite_1 = new ScrolledComposite(grpAttackList, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrolledComposite_1.setBounds(10, 22, 120, 232);
+		scrolledComposite_1.setBounds(10, 22, 120, 326);
 		scrolledComposite_1.setExpandHorizontal(true);
 		scrolledComposite_1.setExpandVertical(true);
 		
@@ -171,21 +117,26 @@ public class SoMStart {
 				if (attackList.getSelectionIndex() >= 0 && attackList.getSelectionIndex() >= 0) {
 					Attack statAttack = runner.getDbase().AttackMap.get(attackList.getItem(attackList.getSelectionIndex()));
 					txtStats.setText(statAttack.toString());
+					try {
+						runner.output.writeObject("tied");
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
 				} else {
 					MessageDialog.openError(SoM, "No Selection", "No attack selected");
 				}
 			}
 		});
 		btnViewStatsa.setText("View Stats");
-		btnViewStatsa.setBounds(35, 260, 70, 25);
+		btnViewStatsa.setBounds(35, 354, 70, 25);
 		
 		Group grpItemList = new Group(SoM, SWT.NONE);
 		grpItemList.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
 		grpItemList.setText("Item List");
-		grpItemList.setBounds(156, 104, 140, 295);
+		grpItemList.setBounds(156, 10, 140, 389);
 		
 		ScrolledComposite scrolledComposite_2 = new ScrolledComposite(grpItemList, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-		scrolledComposite_2.setBounds(10, 22, 120, 232);
+		scrolledComposite_2.setBounds(10, 22, 120, 326);
 		scrolledComposite_2.setExpandHorizontal(true);
 		scrolledComposite_2.setExpandVertical(true);
 		
@@ -206,7 +157,7 @@ public class SoMStart {
 			}
 		});
 		btnViewStatsi.setText("View Stats");
-		btnViewStatsi.setBounds(35, 260, 70, 25);
+		btnViewStatsi.setBounds(35, 354, 70, 25);
 		
 		Button btnViewStatsm = new Button(grpMonsterList, SWT.NONE);
 		btnViewStatsm.addSelectionListener(new SelectionAdapter() {
@@ -220,11 +171,11 @@ public class SoMStart {
 				}
 			}
 		});
-		btnViewStatsm.setBounds(35, 260, 70, 25);
+		btnViewStatsm.setBounds(35, 354, 70, 25);
 		btnViewStatsm.setText("View Stats");
 		
 		Button btnAddToTeam = new Button(SoM, SWT.NONE);
-		btnAddToTeam.setBounds(448, 147, 34, 25);
+		btnAddToTeam.setBounds(448, 79, 34, 25);
 		btnAddToTeam.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -247,7 +198,7 @@ public class SoMStart {
 		btnAddToTeam.setText("->");
 		
 		Button btnRemoveFromTeam = new Button(SoM, SWT.NONE);
-		btnRemoveFromTeam.setBounds(448, 178, 34, 25);
+		btnRemoveFromTeam.setBounds(448, 110, 34, 25);
 		btnRemoveFromTeam.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.NORMAL));
 		btnRemoveFromTeam.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -270,7 +221,7 @@ public class SoMStart {
 		Group grpTeam = new Group(SoM, SWT.NONE);
 		grpTeam.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
 		grpTeam.setText("Team");
-		grpTeam.setBounds(488, 104, 140, 248);
+		grpTeam.setBounds(488, 10, 140, 248);
 		
 		teamList = new List(grpTeam, SWT.BORDER);
 		teamList.setBounds(10, 49, 120, 97);
@@ -345,5 +296,42 @@ public class SoMStart {
 		btnBattle.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.NORMAL));
 		btnBattle.setBounds(615, 606, 97, 66);
 		btnBattle.setText("BATTLE!");
+		
+		
+		FileDialog fd = new FileDialog(SoM, SWT.OPEN);		
+		String[] filterExt = { "*.txt" };
+		fd.setFilterExtensions(filterExt);				
+		runner.setAttFile(fd.open());
+		runner.setItemFile(fd.open());
+		runner.setMonFile(fd.open());
+		
+		try {
+			runner.start();
+		} catch (Exception ex) {
+			MessageDialog.openError(SoM, null, "Could not acquire data");
+			return;
+		}
+		
+		String [] attackArray = new String[runner.getDbase().AttackMap.size()];
+		int count = 0;
+		for (Attack nextAttack : runner.getDbase().AttackMap.values()) {
+			attackArray[count] = nextAttack.getName();
+			count++;
+		}
+		String[] itemArray = new String[runner.getDbase().ItemMap.size()];
+		count = 0;
+		for (Item nextItem : runner.getDbase().ItemMap.values()) {
+			itemArray[count] = nextItem.getName();
+			count++;
+		}
+		String[] monsterArray = new String[runner.getDbase().MonsterMap.size()];
+		count = 0;
+		for (Monster nextMonster : runner.getDbase().MonsterMap.values()) {
+			monsterArray[count] = nextMonster.getName();
+			count++;
+		}
+		attackList.setItems(attackArray);
+		itemList.setItems(itemArray);
+		monsterList.setItems(monsterArray);
 	}
 }
