@@ -285,9 +285,20 @@ public class SoMStart {
 		btnBattle.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (runner.getPlayer().getTeam()[5] != null && runner.getPlayer().getLead() != null) {
+				if (runner.getPlayer().getTeam()[5] != null && runner.getPlayer().getLead() != null
+					&& runner.getIsReady() == false) {
+					runner.setIsReady(true);
+					while (!runner.getBattleStarted()) {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
+					}
 					SoMBattle somBattle = new SoMBattle();
 					somBattle.open();
+				} else if (runner.getIsReady() == true) {
+					MessageDialog.openError(SoM, "Error", "You have already readied yourself for battle!");
 				} else {
 					MessageDialog.openError(SoM, "Error", "Team must be full and have lead to battle!");
 				}
@@ -306,7 +317,7 @@ public class SoMStart {
 		runner.setMonFile(fd.open());
 		
 		try {
-			runner.start();
+			runner.startClient();
 		} catch (Exception ex) {
 			MessageDialog.openError(SoM, null, "Could not acquire data");
 			return;
