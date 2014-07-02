@@ -5,7 +5,7 @@
 
 # Package Files #
 *.jar
-swing2swt!.jar
+!somgui.jar
 !lib/*.jar
 *.war
 *.ear
