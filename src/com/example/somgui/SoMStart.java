@@ -281,12 +281,17 @@ public class SoMStart {
 				if (runner.getPlayer().getTeam()[5] != null && runner.getPlayer().getLead() != null
 					&& runner.getIsReady() == false) {
 					runner.setIsReady(true);
+					synchronized (runner.lock) {
+						runner.lock.notifyAll();
+					}
 					while (!runner.getBattleStarted()) {
-						try {
-							Thread.sleep(1000);
-						} catch (InterruptedException e1) {
-							e1.printStackTrace();
-						}
+						synchronized (runner.lock) {
+							try {
+								runner.lock.wait();
+							} catch (InterruptedException e1) {
+								e1.printStackTrace();
+							}
+						}	
 					}
 					SoMBattle somBattle = new SoMBattle();
 					somBattle.open();
