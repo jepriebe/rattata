@@ -1,7 +1,5 @@
 package com.example.somgui;
 
-import java.io.IOException;
-
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
@@ -117,11 +115,6 @@ public class SoMStart {
 				if (attackList.getSelectionIndex() >= 0 && attackList.getSelectionIndex() >= 0) {
 					Attack statAttack = runner.getDbase().AttackMap.get(attackList.getItem(attackList.getSelectionIndex()));
 					txtStats.setText(statAttack.toString());
-					try {
-						runner.output.writeObject("tied");
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
 				} else {
 					MessageDialog.openError(SoM, "No Selection", "No attack selected");
 				}

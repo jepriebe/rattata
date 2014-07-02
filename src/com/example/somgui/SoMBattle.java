@@ -1,7 +1,5 @@
 package com.example.somgui;
 
-import java.io.IOException;
-
 import com.example.statesofmatter.*;
 
 import org.eclipse.swt.widgets.Display;
@@ -86,10 +84,12 @@ public class SoMBattle {
 		grpMe.setBounds(10, 10, 160, 110);
 		
 		txtMe = new Text(grpMe, SWT.BORDER | SWT.WRAP);
-		String leadStats = String.format("%s%nHP: %d/%d%n" + "State: %s", 
-				   						 runner.getPlayer().getLead().getName(), runner.getPlayer().getLead().getHP(),
-				   						 runner.getPlayer().getLead().getmaxHP(), runner.getPlayer().getLead().getState());
-		txtMe.setText(leadStats);
+		String myStats = String.format("%s%nHP: %d/%d%n" + "State: %s", 
+				   						 runner.getPlayer().getLead().getName(), 
+				   						 runner.getPlayer().getLead().getHP(),
+				   						 runner.getPlayer().getLead().getMaxHP(), 
+				   						 runner.getPlayer().getLead().getState());
+		txtMe.setText(myStats);
 		txtMe.setBounds(10, 22, 140, 78);
 		txtMe.setEditable(false);
 		
@@ -99,7 +99,12 @@ public class SoMBattle {
 		grpOpp.setBounds(224, 10, 160, 110);
 		
 		txtOpp = new Text(grpOpp, SWT.BORDER | SWT.WRAP);
-		txtOpp.setText("Name: null\r\nHP: 0/0\r\nState: null");
+		String oppStats = String.format("%s%nHP: %d/%d%n" + "State: %s",
+										runner.getOppLead().getName(),
+										runner.getOppLead().getHP(),
+										runner.getOppLead().getMaxHP(),
+										runner.getOppLead().getState());
+		txtOpp.setText(oppStats);
 		txtOpp.setEditable(false);
 		txtOpp.setBounds(10, 22, 140, 78);
 		
@@ -125,12 +130,6 @@ public class SoMBattle {
 					comboSwitch.setEnabled(false);
 				}
 				comboAttack.setEnabled(true);
-				try {
-					runner.output.writeObject("tied");
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
 			}
 		});
 		
@@ -236,7 +235,7 @@ public class SoMBattle {
 					//runner.getPlayer().getLead() = player.getLead();
 					String leadStats = String.format("%s%nHP: %s/%s%n" + "State: %s", 
 	   						 						 runner.getPlayer().getLead().getName(), runner.getPlayer().getLead().getHP(),
-	   						 						 runner.getPlayer().getLead().getmaxHP(), runner.getPlayer().getLead().getState());
+	   						 						 runner.getPlayer().getLead().getMaxHP(), runner.getPlayer().getLead().getState());
 					txtMe.setText(leadStats);
 					comboSwitch.setEnabled(false);
 					ready = false;
