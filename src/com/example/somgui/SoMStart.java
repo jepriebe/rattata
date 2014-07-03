@@ -64,7 +64,7 @@ public class SoMStart {
 	 */
 	protected void createContents() {
 		SoM = new Shell();
-		SoM.setSize(738, 720);
+		SoM.setSize(738, 580);
 		SoM.setText("States of Matter");
 		SoM.setLayout(null);
 		
@@ -87,11 +87,11 @@ public class SoMStart {
 		Group grpDisplayStats = new Group(SoM, SWT.NONE);
 		grpDisplayStats.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
 		grpDisplayStats.setText("Display Stats");
-		grpDisplayStats.setBounds(10, 405, 245, 267);
+		grpDisplayStats.setBounds(448, 264, 264, 267);
 		
 		txtStats = new Text(grpDisplayStats, SWT.BORDER | SWT.WRAP);
 		txtStats.setEditable(false);
-		txtStats.setBounds(10, 22, 225, 235);
+		txtStats.setBounds(10, 22, 244, 235);
 		
 		Group grpAttackList = new Group(SoM, SWT.NONE);
 		grpAttackList.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
@@ -303,7 +303,7 @@ public class SoMStart {
 			}
 		});
 		btnBattle.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.NORMAL));
-		btnBattle.setBounds(615, 606, 97, 66);
+		btnBattle.setBounds(634, 10, 78, 66);
 		btnBattle.setText("BATTLE!");
 		
 		

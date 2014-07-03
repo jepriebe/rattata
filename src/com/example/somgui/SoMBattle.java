@@ -16,7 +16,9 @@ import org.eclipse.swt.widgets.Button;
 public class SoMBattle {
 
 	protected Shell SoMB;
+	
 	protected static LocalGameRunner runner = SoMStart.runner;
+	
 	private Text txtMe;
 	private Text txtOpp;
 	private Group grpBattle;
@@ -29,7 +31,6 @@ public class SoMBattle {
 	private CCombo comboState;
 	private CCombo comboItem;
 	private CCombo comboSwitch;
-	private boolean ready = true; //should be set to false once move selected and set back to true once turn is resolved
 
 	/**
 	 * Launch the application.
@@ -52,8 +53,8 @@ public class SoMBattle {
 		createContents();
 		SoMB.open();
 		SoMB.layout();
-		while (!SoMB.isDisposed() && true) {
-			if (ready) {
+		while (!SoMB.isDisposed()) {
+			if (runner.getTurnReady()) {
 				this.btnAttack.setEnabled(true);
 				this.btnState.setEnabled(true);
 				this.btnItem.setEnabled(true);
@@ -63,6 +64,16 @@ public class SoMBattle {
 				this.btnState.setEnabled(false);
 				this.btnItem.setEnabled(false);
 				this.btnSwitch.setEnabled(false);
+				
+				while (!runner.getTurnReady()) {
+					synchronized (runner.lock) {
+						try {
+							runner.lock.wait();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
 			}
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -114,6 +125,7 @@ public class SoMBattle {
 		grpBattle.setBounds(10, 126, 374, 132);
 		
 		txtInfo = new Text(grpBattle, SWT.BORDER | SWT.WRAP);
+		txtInfo.setText("Select a move!");
 		txtInfo.setEditable(false);
 		txtInfo.setBounds(154, 20, 210, 102);
 		
@@ -151,7 +163,7 @@ public class SoMBattle {
 					btnState.setEnabled(false);
 					btnItem.setEnabled(false);
 					btnSwitch.setEnabled(false);
-					ready = false;
+					runner.setTurnReady(false);
 					txtInfo.setText(runner.getPlayer().getLead().getName() + " uses " + myAttack.getName() + "!");
 				}
 			}
@@ -230,16 +242,40 @@ public class SoMBattle {
 				if (comboSwitch.getSelection() != null) {
 					runner.setAction(PlayerAction.SWITCH);
 					runner.setArgument(comboSwitch.getSelectionIndex());
-					String oldLead = runner.getPlayer().getLead().getName();
-					//myTurn.executeTurn(player);
-					//runner.getPlayer().getLead() = player.getLead();
-					String leadStats = String.format("%s%nHP: %s/%s%n" + "State: %s", 
-	   						 						 runner.getPlayer().getLead().getName(), runner.getPlayer().getLead().getHP(),
-	   						 						 runner.getPlayer().getLead().getMaxHP(), runner.getPlayer().getLead().getState());
-					txtMe.setText(leadStats);
 					comboSwitch.setEnabled(false);
-					ready = false;
-					txtInfo.setText(oldLead + " is called back and " + runner.getPlayer().getLead().getName() + " is switched in!");
+					String oldLead = runner.getPlayer().getLead().getName();
+					String oldOppLead = runner.getOppLead().getName();
+					synchronized (runner.lock) {
+						runner.lock.notify();
+					}
+					runner.setTurnReady(false);
+					while (!runner.getTurnReady()) {
+						synchronized (runner.lock) {
+							try {
+								runner.lock.wait();
+							} catch (InterruptedException e1) {
+								e1.printStackTrace();
+							}
+						}
+					}
+					String myStats = String.format("%s%nHP: %s/%s%n" + "State: %s", 
+	   						 	 runner.getPlayer().getLead().getName(), 
+	   						 	 runner.getPlayer().getLead().getHP(),
+	   						 	 runner.getPlayer().getLead().getMaxHP(), 
+	   						 	 runner.getPlayer().getLead().getState());
+					String oppStats = String.format("%s%nHP: %s/%s%n" + "State: %s", 
+		 						 runner.getOppLead().getName(), 
+		 						 runner.getOppLead().getHP(),
+		 						 runner.getOppLead().getMaxHP(), 
+		 						 runner.getOppLead().getState());
+					txtMe.setText(myStats);
+					txtOpp.setText(oppStats);
+					txtInfo.setText(oldLead + " is called back and " + 
+									runner.getPlayer().getLead().getName() + 
+								 	" is switched in!\r\n\r\n" +
+									"Opponent called back " + oldOppLead + 
+									" and switched in " + 
+									runner.getOppLead().getName() + "!");
 				}
 			}
 		});
