@@ -13,11 +13,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.widgets.Button;
 
+//TODO learn about SWT synchronization
 public class SoMBattle {
 
 	protected Shell SoMB;
+	protected Display display;
 	
 	protected static LocalGameRunner runner = SoMStart.runner;
+	
+	private boolean stateChanged = false;
 	
 	private Text txtMe;
 	private Text txtOpp;
@@ -49,32 +53,11 @@ public class SoMBattle {
 	 * Open the window.
 	 */
 	public void open() {
-		Display display = Display.getDefault();
+		display = Display.getDefault();
 		createContents();
 		SoMB.open();
 		SoMB.layout();
 		while (!SoMB.isDisposed()) {
-			if (runner.getTurnReady()) {
-				this.btnAttack.setEnabled(true);
-				this.btnState.setEnabled(true);
-				this.btnItem.setEnabled(true);
-				this.btnSwitch.setEnabled(true);
-			} else {
-				this.btnAttack.setEnabled(false);
-				this.btnState.setEnabled(false);
-				this.btnItem.setEnabled(false);
-				this.btnSwitch.setEnabled(false);
-				
-				while (!runner.getTurnReady()) {
-					synchronized (runner.lock) {
-						try {
-							runner.lock.wait();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
@@ -151,20 +134,55 @@ public class SoMBattle {
 		comboAttack.setBounds(64, 20, 84, 21);
 		for (Attack a : runner.getPlayer().getLead().getAttacks()) {
 			if (a != null)
-			comboAttack.add(a.getName());
+				comboAttack.add(a.getName());
 		}
 		comboAttack.addSelectionListener(new SelectionAdapter() {
+			int currentIndex = comboAttack.getSelectionIndex();
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (comboAttack.getSelection() != null) {
-					Attack myAttack = runner.getPlayer().getLead().getAttacks()[comboAttack.getSelectionIndex()];
-					comboAttack.setEnabled(false);
+				if (comboAttack.getSelectionIndex() < 4) {
+					currentIndex = comboAttack.getSelectionIndex();
+					runner.setAction(PlayerAction.ATTACK);
+					runner.setArgument(currentIndex);
+					if (!stateChanged)
+						runner.setTurnState(runner.getPlayer().getLead().getState());
 					btnAttack.setEnabled(false);
 					btnState.setEnabled(false);
 					btnItem.setEnabled(false);
 					btnSwitch.setEnabled(false);
+					comboAttack.setEnabled(false);
+					synchronized (runner.lock) {
+						runner.lock.notify();
+					}
 					runner.setTurnReady(false);
-					txtInfo.setText(runner.getPlayer().getLead().getName() + " uses " + myAttack.getName() + "!");
+					while (!runner.getTurnReady()) {
+						try {
+							Thread.sleep(200);
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
+					}
+					String myStats = String.format("%s%nHP: %s/%s%n" + "State: %s", 
+		   				 	 runner.getPlayer().getLead().getName(), 
+	  					 	 runner.getPlayer().getLead().getHP(),
+						 	 runner.getPlayer().getLead().getMaxHP(), 
+						 	 runner.getPlayer().getLead().getState());
+					String oppStats = String.format("%s%nHP: %s/%s%n" + "State: %s", 
+	 						 runner.getOppLead().getName(), 
+	 						 runner.getOppLead().getHP(),
+	 						 runner.getOppLead().getMaxHP(), 
+	 						 runner.getOppLead().getState());
+					txtMe.setText(myStats);
+					txtOpp.setText(oppStats);
+					txtInfo.setText(runner.getPlayer().getLead().getName() + 
+							" uses " + 
+							runner.getPlayer().getLead().getAttacks()[comboAttack.getSelectionIndex()].getName() + "!");
+					stateChanged = false;
+					btnAttack.setEnabled(true);
+					btnState.setEnabled(true);
+					btnItem.setEnabled(true);
+					btnSwitch.setEnabled(true);
+					
 				}
 			}
 		});
@@ -189,6 +207,27 @@ public class SoMBattle {
 		comboState.setEnabled(false);
 		comboState.setEditable(false);
 		comboState.setBounds(64, 47, 84, 21);
+		for (int i = 0; i < 4; i++) {
+			comboState.add(State.values()[i].toString(), i);
+		}
+		comboState.setText(runner.getPlayer().getLead().getState().toString());
+		comboState.addSelectionListener(new SelectionAdapter() {
+			int currentIndex = comboState.getSelectionIndex();
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (comboState.getSelectionIndex() != currentIndex) {
+					currentIndex = comboState.getSelectionIndex();
+					runner.setTurnState(State.values()[currentIndex]);
+					stateChanged = true;
+					System.out.println(runner.getTurnState());
+					Display.getDefault().asyncExec(new Runnable() {
+						public void run() {
+							btnSwitch.setEnabled(false);
+						}
+					});
+				}
+			}
+		});
 		
 		btnItem = new Button(grpBattle, SWT.NONE);
 		btnItem.setFont(SWTResourceManager.getFont("Segoe UI", 8, SWT.NORMAL));
@@ -237,32 +276,37 @@ public class SoMBattle {
 		}
 		comboSwitch.setText(runner.getPlayer().getLead().getName());
 		comboSwitch.addSelectionListener(new SelectionAdapter() {
+			int currentIndex = comboSwitch.getSelectionIndex();
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (comboSwitch.getSelection() != null) {
+				if (comboSwitch.getSelectionIndex() != currentIndex) {
+					currentIndex = comboSwitch.getSelectionIndex();
 					runner.setAction(PlayerAction.SWITCH);
-					runner.setArgument(comboSwitch.getSelectionIndex());
+					runner.setArgument(currentIndex);
 					comboSwitch.setEnabled(false);
-					String oldLead = runner.getPlayer().getLead().getName();
-					String oldOppLead = runner.getOppLead().getName();
+					final String oldLead = runner.getPlayer().getLead().getName();
+					final String oldOppLead = runner.getOppLead().getName();
 					synchronized (runner.lock) {
 						runner.lock.notify();
 					}
 					runner.setTurnReady(false);
 					while (!runner.getTurnReady()) {
-						synchronized (runner.lock) {
-							try {
-								runner.lock.wait();
-							} catch (InterruptedException e1) {
-								e1.printStackTrace();
-							}
+						try {
+							Thread.sleep(200);
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
 						}
 					}
+					comboAttack.remove(0, (comboAttack.getItemCount() - 1));
+					for (Attack a : runner.getPlayer().getLead().getAttacks()) {
+						if (a != null)
+							comboAttack.add(a.getName());
+					}
 					String myStats = String.format("%s%nHP: %s/%s%n" + "State: %s", 
-	   						 	 runner.getPlayer().getLead().getName(), 
-	   						 	 runner.getPlayer().getLead().getHP(),
-	   						 	 runner.getPlayer().getLead().getMaxHP(), 
-	   						 	 runner.getPlayer().getLead().getState());
+			   				 	 runner.getPlayer().getLead().getName(), 
+		  					 	 runner.getPlayer().getLead().getHP(),
+							 	 runner.getPlayer().getLead().getMaxHP(), 
+							 	 runner.getPlayer().getLead().getState());
 					String oppStats = String.format("%s%nHP: %s/%s%n" + "State: %s", 
 		 						 runner.getOppLead().getName(), 
 		 						 runner.getOppLead().getHP(),
@@ -276,8 +320,30 @@ public class SoMBattle {
 									"Opponent called back " + oldOppLead + 
 									" and switched in " + 
 									runner.getOppLead().getName() + "!");
+					btnAttack.setEnabled(true);
+					btnState.setEnabled(true);
+					btnItem.setEnabled(true);
+					btnSwitch.setEnabled(true);
 				}
 			}
 		});
 	}
 }
+//TODO figure out how to implement this to disable and re-enable buttons
+/*     b.addSelectionListener(new SelectionAdapter() {
+             public void widgetSelected(SelectionEvent event) {
+                text.append("Testing Thread Update\n");
+                b.setEnabled(false);
+                Display.getCurrent().asyncExec(new Runnable() {
+                   public void run() {
+                      try {
+                         Thread.sleep(5000);
+                      } catch (Exception e) {
+                      }
+                      text.append("Added something else\n");
+                      b.setEnabled(true);
+                   }
+                });
+             }
+          });
+*/

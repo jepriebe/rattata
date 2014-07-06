@@ -2,7 +2,6 @@ package com.example.somgui;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -305,14 +304,6 @@ public class SoMStart {
 		btnBattle.setFont(SWTResourceManager.getFont("Segoe UI", 14, SWT.NORMAL));
 		btnBattle.setBounds(634, 10, 78, 66);
 		btnBattle.setText("BATTLE!");
-		
-		
-		FileDialog fd = new FileDialog(SoM, SWT.OPEN);		
-		String[] filterExt = { "*.txt" };
-		fd.setFilterExtensions(filterExt);				
-		runner.setAttFile(fd.open());
-		runner.setItemFile(fd.open());
-		runner.setMonFile(fd.open());
 		
 		try {
 			runner.startClient();
