@@ -182,7 +182,7 @@ public class SoMBattle {
 					btnState.setEnabled(true);
 					btnItem.setEnabled(true);
 					btnSwitch.setEnabled(true);
-					
+					comboAttack.setText("");
 				}
 			}
 		});
@@ -298,6 +298,7 @@ public class SoMBattle {
 						}
 					}
 					comboAttack.remove(0, (comboAttack.getItemCount() - 1));
+					comboAttack.setText("");
 					for (Attack a : runner.getPlayer().getLead().getAttacks()) {
 						if (a != null)
 							comboAttack.add(a.getName());
