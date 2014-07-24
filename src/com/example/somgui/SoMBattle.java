@@ -70,7 +70,7 @@ public class SoMBattle {
 	protected void createContents() {
 		SoMB = new Shell();
 		SoMB.setSize(410, 305);
-		SoMB.setText("States of Matter Arena");
+		SoMB.setText("States of Matter Arena - Player " + (runner.getPlayerNum() + 1));
 		
 		Group grpMe = new Group(SoMB, SWT.NONE);
 		grpMe.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.NORMAL));
@@ -151,10 +151,10 @@ public class SoMBattle {
 					btnItem.setEnabled(false);
 					btnSwitch.setEnabled(false);
 					comboAttack.setEnabled(false);
+					runner.setTurnReady(true);
 					synchronized (runner.lock) {
 						runner.lock.notify();
 					}
-					runner.setTurnReady(false);
 					while (!runner.getTurnReady()) {
 						try {
 							Thread.sleep(200);
@@ -220,11 +220,7 @@ public class SoMBattle {
 					runner.setTurnState(State.values()[currentIndex]);
 					stateChanged = true;
 					System.out.println(runner.getTurnState());
-					Display.getDefault().asyncExec(new Runnable() {
-						public void run() {
-							btnSwitch.setEnabled(false);
-						}
-					});
+					btnSwitch.setEnabled(false);
 				}
 			}
 		});
@@ -284,12 +280,12 @@ public class SoMBattle {
 					runner.setAction(PlayerAction.SWITCH);
 					runner.setArgument(currentIndex);
 					comboSwitch.setEnabled(false);
-					final String oldLead = runner.getPlayer().getLead().getName();
-					final String oldOppLead = runner.getOppLead().getName();
+					String oldLead = runner.getPlayer().getLead().getName();
+					String oldOppLead = runner.getOppLead().getName();
+					runner.setTurnReady(true);
 					synchronized (runner.lock) {
 						runner.lock.notify();
 					}
-					runner.setTurnReady(false);
 					while (!runner.getTurnReady()) {
 						try {
 							Thread.sleep(200);
