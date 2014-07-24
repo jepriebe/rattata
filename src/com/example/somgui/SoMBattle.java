@@ -155,7 +155,7 @@ public class SoMBattle {
 					synchronized (runner.lock) {
 						runner.lock.notify();
 					}
-					while (!runner.getTurnReady()) {
+					while (runner.getTurnReady()) {
 						try {
 							Thread.sleep(200);
 						} catch (InterruptedException e1) {
@@ -286,7 +286,7 @@ public class SoMBattle {
 					synchronized (runner.lock) {
 						runner.lock.notify();
 					}
-					while (!runner.getTurnReady()) {
+					while (runner.getTurnReady()) {
 						try {
 							Thread.sleep(200);
 						} catch (InterruptedException e1) {
