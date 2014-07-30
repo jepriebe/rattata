@@ -21,7 +21,10 @@ import org.eclipse.swt.custom.CCombo;
 public class SoMStart {
 
 	protected Shell SoM;
+	protected Display display;
+	
 	protected static LocalGameRunner runner = new LocalGameRunner();
+	
 	protected List attackList;
 	protected List itemList;
 	protected List monsterList;
@@ -29,6 +32,8 @@ public class SoMStart {
 	private Text txtStats;
 	private Text txtLead;
 	private CCombo comboState;
+	private Button btnBattle;
+	
 
 	/**
 	 * Launch the application.
@@ -47,7 +52,7 @@ public class SoMStart {
 	 * Open the window.
 	 */
 	public void open() {
-		Display display = Display.getDefault();
+		display = Display.getDefault();
 		createContents();
 		SoM.open();
 		SoM.layout();
@@ -273,27 +278,19 @@ public class SoMStart {
 			}
 		});
 		
-		Button btnBattle = new Button(SoM, SWT.NONE);
+		btnBattle = new Button(SoM, SWT.NONE);
 		btnBattle.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (runner.getPlayer().getTeam()[5] != null && runner.getPlayer().getLead() != null
 					&& runner.getIsReady() == false) {
+					btnBattle.setEnabled(false);
+					btnBattle.setText("Waiting");
 					runner.setIsReady(true);
 					synchronized (runner.lock) {
 						runner.lock.notifyAll();
 					}
-					while (!runner.getBattleStarted()) {
-						synchronized (runner.lock) {
-							try {
-								runner.lock.wait();
-							} catch (InterruptedException e1) {
-								e1.printStackTrace();
-							}
-						}	
-					}
-					SoMBattle somBattle = new SoMBattle();
-					somBattle.open();
+					SoMUpdater.startBattle(runner, display, btnBattle).start();
 				} else if (runner.getIsReady() == true) {
 					MessageDialog.openError(SoM, "Error", "You have already readied yourself for battle!");
 				} else {
