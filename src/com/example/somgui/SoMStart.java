@@ -290,7 +290,7 @@ public class SoMStart {
 					synchronized (runner.lock) {
 						runner.lock.notifyAll();
 					}
-					SoMUpdater.startBattle(runner, display, btnBattle).start();
+					BattleStarter.startBattle(runner, display, btnBattle).start();
 				} else if (runner.getIsReady() == true) {
 					MessageDialog.openError(SoM, "Error", "You have already readied yourself for battle!");
 				} else {

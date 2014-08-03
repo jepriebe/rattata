@@ -21,6 +21,8 @@ public class SoMBattle {
 	
 	protected LocalGameRunner runner;
 	
+	private SoMUpdater updater;
+	
 	private boolean stateChanged = false;
 	
 	private Text txtMe;
@@ -57,6 +59,10 @@ public class SoMBattle {
 		createContents();
 		SoMB.open();
 		SoMB.layout();
+		updater = new SoMUpdater(runner, display, comboAttack, comboState,
+				comboItem, comboSwitch, txtMe, txtOpp, txtInfo, btnAttack,
+				btnState, btnItem, btnSwitch);
+		updater.start();
 		while (!SoMB.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -158,11 +164,12 @@ public class SoMBattle {
 					comboAttack.setEnabled(false);
 					stateChanged = false;
 					runner.setTurnReady(true);
+					updater.setParams(comboAttack, comboState, 
+							comboItem, comboSwitch, txtMe, txtOpp, txtInfo, 
+							btnAttack, btnState, btnItem, btnSwitch);
 					synchronized (runner.lock) {
 						runner.lock.notify();
 					}
-					SoMUpdater.doStuff(runner, display, comboAttack, txtMe, txtOpp,
-							txtInfo, btnAttack, btnState, btnItem, btnSwitch).start();
 				} else {
 					System.err.println("Index out of bounds.");
 				}
@@ -268,11 +275,12 @@ public class SoMBattle {
 					btnSwitch.setEnabled(false);
 					comboSwitch.setEnabled(false);
 					runner.setTurnReady(true);
+					updater.setParams(comboAttack, comboState, 
+							comboItem, comboSwitch, txtMe, txtOpp, txtInfo, 
+							btnAttack, btnState, btnItem, btnSwitch);
 					synchronized (runner.lock) {
 						runner.lock.notify();
 					}
-					SoMUpdater.doStuff(runner, display, comboSwitch, comboAttack, txtMe, txtOpp,
-							txtInfo, btnAttack, btnState, btnItem, btnSwitch).start();
 				} else {
 					System.err.println("Index out of bounds.");
 				}
