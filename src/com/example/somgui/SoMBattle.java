@@ -13,7 +13,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.widgets.Button;
 
-//TODO learn about SWT synchronization
 public class SoMBattle {
 
 	protected Shell SoMB;
@@ -67,7 +66,6 @@ public class SoMBattle {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
-			//TODO spin off a thread to handle waiting for updates?
 		}
 	}
 	
@@ -288,21 +286,3 @@ public class SoMBattle {
 		});
 	}
 }
-//TODO figure out how to implement this to disable and re-enable buttons
-/*     b.addSelectionListener(new SelectionAdapter() {
-             public void widgetSelected(SelectionEvent event) {
-                text.append("Testing Thread Update\n");
-                b.setEnabled(false);
-                Display.getCurrent().asyncExec(new Runnable() {
-                   public void run() {
-                      try {
-                         Thread.sleep(5000);
-                      } catch (Exception e) {
-                      }
-                      text.append("Added something else\n");
-                      b.setEnabled(true);
-                   }
-                });
-             }
-          });
-*/
